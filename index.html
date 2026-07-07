@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croissant & Co. | Французская пекарня</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body, html {
+            width: 100%; height: 100%;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5ebe0 0%, #e3d5ca 100%);
+            color: #d4a373;
+            overflow: hidden;
+        }
+
+        /* Задний фон пекарни */
+        .bakery-bg {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 20px; filter: blur(3px); opacity: 0.6;
+            pointer-events: none;
+        }
+        .header { font-size: 28px; font-weight: bold; margin-bottom: 30px; color: #6f4e37; }
+        .grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .card { background: white; width: 200px; height: 250px; border-radius: 15px; }
+
+        /* Окно капчи */
+        .captcha-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(111, 78, 55, 0.2);
+            backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+        
+        .captcha-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 360px; width: 90%;
+        }
+
+        .captcha-box h2 { color: #6f4e37; font-size: 22px; margin-bottom: 12px; }
+        .captcha-box p { color: #8c7261; font-size: 14px; margin-bottom: 25px; line-height: 1.4; }
+
+        /* Кнопка */
+        .btn {
+            background: linear-gradient(135deg, #d4a373 0%, #a98467 100%);
+            color: white; border: none;
+            padding: 16px 32px; font-size: 16px; font-weight: 600;
+            border-radius: 50px; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(169, 132, 103, 0.4);
+            transition: transform 0.1s ease;
+            width: 100%;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.98); }
+
+        /* Плеер */
+        #rick-video {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover; z-index: 9999; background: black;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bakery-bg">
+        <div class="header">🥐 Croissant & Co.</div>
+        <div class="grid"><div class="card"></div><div class="card"></div></div>
+    </div>
+
+    <div class="captcha-overlay" id="captcha-layer">
+        <div class="captcha-box">
+            <h2>Проверка безопасности</h2>
+            <p>Подтвердите, что вы не робот.<br>Нажмите на кнопку ниже.</p>
+            <button class="btn" id="click-btn">Кликните 5 раз</button>
+        </div>
+    </div>
+
+    <video id="rick-video" src="rickroll.mp4" loop playsinline></video>
+
+    <script>
+        const btn = document.getElementById('click-btn');
+        const video = document.getElementById('rick-video');
+        const captchaLayer = document.getElementById('captcha-layer');
+        
+        let clicksLeft = 5;
+
+        video.load();
+
+        btn.addEventListener('click', () => {
+            clicksLeft--;
+
+            if (clicksLeft > 0) {
+                btn.innerText = `Кликните еще ${clicksLeft} раз`;
+            } else if (clicksLeft === 0) {
+                btn.innerText = "Перенаправление...";
+                btn.style.pointerEvents = "none";
+                
+                setTimeout(() => {
+                    captchaLayer.style.display = 'none';
+                    video.style.display = 'block';
+                    
+                    video.volume = 1.0; 
+                    
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => { video.play(); });
+                    }
+
+                    const docEl = document.documentElement;
+                    if (docEl.requestFullscreen) {
+                        docEl.requestFullscreen();
+                    } else if (docEl.webkitRequestFullscreen) {
+                        docEl.webkitRequestFullscreen();
+                    } else if (docEl.mozRequestFullScreen) {
+                        docEl.mozRequestFullScreen();
+                    } else if (docEl.msRequestFullscreen) {
+                        docEl.msRequestFullscreen();
+                    }
+
+                }, 600);
+            }
+        });
+    </script>
+</body>
+</html>
